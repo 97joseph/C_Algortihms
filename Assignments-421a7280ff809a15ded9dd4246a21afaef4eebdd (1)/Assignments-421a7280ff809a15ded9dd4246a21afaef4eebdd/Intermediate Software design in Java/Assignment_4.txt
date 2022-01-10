@@ -1,0 +1,791 @@
+/**
+ * Created by dillon on 1/31/2017.
+ * This program acts as a software client to a talent agency in
+ * thee enterntainment industry. It is comprised of agents
+ * that take clients who are either writers or actors with
+ * their respective attributes. This program works to display
+ * each type of clients attributes.
+ */
+
+public class Foothill {
+    public static void main(String[] args) {
+
+        Actor client1 = new Actor("Bill", 125000, 2, 'M', 43);
+        Actor client2 = new Actor("Jim", 20000, 9, 'M', 25);
+        Actor client3 = new Actor("Jennifer", 56800, 3, 'F', 32);
+        Actor client4 = new Actor("Frieda", 78098, 7, 'F', 29);
+        Actor client5 = new Actor("Brad", 34500, 4, 'M', 23);
+        Writer client6 = new Writer("Bob", 54670, 12, false, false, true, false,
+                        "Staff writer");
+        Writer client7 = new Writer("Jack", 100000, 5, true, false, false, true,
+                        "co-producer");
+        Writer client8 = new Writer("Greg", 12300, 15, false, true, true, false,
+                "co-executive producer");
+        Writer client9 = new Writer("Joe", 156000, 15, true, true, true, false,
+                "executive producer");
+        Writer client10 = new Writer("Matthew", 98700, 15, false, false, true, true,
+                "Story editor");
+
+
+        System.out.println(client1.toString());
+        System.out.println(client3.toString());
+        System.out.println(client5.toString());
+        System.out.println(client7.toString());
+        System.out.println(client8.toString());
+        System.out.println(client10.toString());
+
+
+        Agent agent = new Agent("Dillon");
+
+        agent.addClient(client2);
+        agent.addClient(client4);
+        agent.addClient(client5);
+        agent.addClient(client6);
+        agent.addClient(client9);
+        agent.addClient(client1);
+        agent.addClient(client3);
+        agent.addClient(client7);
+        agent.addClient(client8);
+        agent.addClient(client10);
+
+        System.out.println("\n\n------------Agent string methods-----------\n\n");
+        System.out.println(agent.toStringClientsLong());
+        System.out.println(agent.toStringClientsShort());
+        System.out.println("$" + agent.getIncome());
+
+
+        //Remove a memeber (Writer bob)
+        agent.removeClient(client6);
+
+        System.out.println("\n\n------------Agent string methods run #2-----------\n\n");
+        System.out.println(agent.toStringClientsLong());
+        System.out.println(agent.toStringClientsShort());
+        System.out.println("$" + agent.getIncome());
+
+
+
+    }
+}
+
+/*
+This class is a base class named Client that stores general
+information for any client registered in the talent agency
+regardless of profession, it stores the client's name, income
+for the current year and the agent's cut of the income.
+ */
+class Client {
+    private String name;
+    private long incomeThisYear;
+    double percentCut;
+    private static final int MIN_NAME_LENGTH = 3;
+    private static final long MIN_INCOME_THIS_YEAR = 0;
+    private static final double MIN_PERCENT_CUT = 0;
+    private static final int MAX_NAME_LENGTH = 60;
+    private static final long MAX_INCOME_THIS_YEAR = 1000000000;
+    private static final double MAX_PERCENT_CUT = 99.99;
+
+    public Client(String name, long incomeThisYear, double percentCut){
+
+        //Validation provided for each data member in the class
+        if (!setIncomeThisYear(incomeThisYear)){
+            setIncomeThisYear(0);
+        }
+
+        if (!setName(name)){
+            setName("Name Unknown");
+        }
+
+        if (!setPercentCut(percentCut)){
+            setPercentCut(percentCut);
+        }
+
+    }
+    public Client(){
+        this("", 0, 10);//Name will cause setName validation to return false
+    }
+
+    public boolean setName(String name) {
+        if (nameIsValid(name)){
+            this.name = name;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setIncomeThisYear(long incomeThisYear) {
+        if (yearlyIncomeIsValid(incomeThisYear)){
+            this.incomeThisYear = incomeThisYear;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setPercentCut(double percentCut) {
+        if (percentCutIsValid(percentCut)){
+            this.percentCut = percentCut;
+            return true;
+        }
+        return false;
+
+    }
+
+    public long getIncomeThisYear() {
+        return incomeThisYear;
+    }
+
+    public double getPercentCut() {
+        return percentCut;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+
+    public String toString(){
+        return ("Name: "+ name +
+                "\nIncome this year: " + incomeThisYear+
+               "\nPercent-cut: "+ percentCut );
+    }
+
+    private static boolean nameIsValid(String name){
+        if (name.length() < MIN_NAME_LENGTH || name.length() > MAX_NAME_LENGTH){
+            return false;
+        }
+        return true;
+    }
+    private static boolean yearlyIncomeIsValid(long incomeThisYear){
+        if (incomeThisYear < MIN_INCOME_THIS_YEAR ||
+                incomeThisYear > MAX_INCOME_THIS_YEAR){
+            return false;
+        }
+        return true;
+    }
+    private static boolean percentCutIsValid(double percentCut){
+        if (percentCut < MIN_PERCENT_CUT || percentCut > MAX_PERCENT_CUT){
+            return false;
+        }
+        return true;
+    }
+
+}
+
+/*
+This class makes up one of two sub/derived classes. This class
+stores clients of the type writer and their respective
+attributes and roles as a writer (stored in rank)
+ */
+
+class Writer extends Client{
+
+    private boolean technical;
+    private boolean government;
+    private boolean international;
+    private boolean degree;
+    private String rank;
+
+    static String[] rankTypes = {"Staff writer", "Story editor", "co-producer",
+                           "producer", "co-executive producer", "executive producer"};
+
+
+    public Writer(String name, long incomeThisYear, double percentCut,
+                  boolean technical, boolean government, boolean international,
+                  boolean degree, String rank){
+
+        super(name, incomeThisYear, percentCut);
+        setDegree(degree);
+        setGovernment(government);
+        setInternational(international);
+        setTechnical(technical);
+
+        if (!setRank(rank)){
+            setRank("Staff writer");
+        }
+
+    }
+
+
+
+
+    public Writer(){
+        this("", 0, 10, false, false, false, false, "");
+    }
+
+    //--------------------------------Accessors-----------------------------
+
+    public String getRank() {
+        return rank;
+    }
+
+    public boolean getDegree(){
+        return degree;
+    }
+
+
+    public boolean getTechnical() {
+        return technical;
+    }
+
+    public boolean getGovernment() {
+        return government;
+    }
+
+    public boolean getInternational() {
+        return international;
+    }
+    //-------------------------------------------------------------------------
+
+    //Validation required for only the method below
+    private static boolean rankIsValid(String rank) {
+        for (int i = 0; i < rankTypes.length; i++) {
+            if (rankTypes[i] == rank){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //---------------------------------Mutators------------------------------
+    public boolean setRank(String rank) {
+        if (rankIsValid(rank)) {
+            this.rank = rank;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setDegree(boolean degree){
+        this.degree = degree;
+        return true;
+    }
+
+
+    public boolean setTechnical(boolean technical)
+    {
+        this.technical = technical;
+        return true;
+    }
+
+    public boolean setGovernment(boolean government)
+    {
+        this.government = government;
+        return true;
+    }
+
+    public boolean setInternational(boolean international)
+    {
+        this.international = international;
+        return true;
+    }
+
+
+
+
+
+
+    //------------------------------------------------------------------------------
+
+    public String toString(){
+        return (super.toString() +
+                "\nDegree: " + degree +
+                "\nTechnical: " + technical +
+                "\nInternational: " + international +
+                "\nGovernment: " + government +
+                "\nRank: " + rank + "\n\n");
+    }
+}
+
+
+
+
+
+/*
+This is the second class that is derived from the base class
+Client. It stores 2 defining characteristics of an actor,
+gender and age. Similar to the Writer class, this class
+also has a to string method to display the client's
+information.
+ */
+class Actor extends Client{
+    private char gender;
+    private int age;
+
+    public Actor(String name, long incomeThisYear, double percentCut,
+                 char gender, int age){
+        super(name, incomeThisYear, percentCut);
+        if (!setAge(age)){
+            setAge(0);
+        }
+        if (!setGender(gender)){
+            setGender('F');
+        }
+    }
+    public Actor(){
+        this("", 0, 10, 'F', 0);
+    }
+    //Accessors---------------------------------------------------
+    public char getGender(){
+        return gender;
+    }
+
+    public int getAge(){
+        return age;
+    }
+
+    //Mutators-------------------------------------------------
+
+    public boolean setGender(char gender){
+        if (genderIsValid(gender)){
+            this.gender = gender;
+            return true;
+        }
+        return false;
+    }
+    public boolean setAge(int age){
+        if (ageIsValid(age)){
+            this.age = age;
+            return true;
+        }
+        return false;
+    }
+
+
+    //Validation------------------------------------------------
+    public static boolean genderIsValid(char gender){
+        if (gender == 'M' || gender == 'F'){
+            return true;
+        }
+        return false;
+    }
+    public static boolean ageIsValid(int age){
+        if (age >= 0 || age <= 100){
+            return true;
+        }
+        return false;
+    }
+
+    public String toString(){
+       return ( super.toString() + "\nAge: " + age +
+                "\nGender: " + gender + "\n\n");
+    }
+}
+
+
+/*
+This class is used to represent individual agents
+to hold Client object and Client's derived objects.
+The agent acts as a client's manager and can only
+hold a total of 10 clients. The clients can be of
+either type, actor or writer. The agent gets a cut
+of each client's income for the current year.
+ */
+class Agent {
+
+    private static final int MAX_CLIENTS = 10;
+    private static final int MIN_NAME_LEN = 3;
+    private static final int MAX_NAME_LEN = 60;
+    int numClients;
+    private String name;
+    private Client[] myClients;
+
+
+    public Agent(String name){
+        if (!setName(name)){
+            setName("Name unknown");
+        }
+        numClients = 0;
+        myClients = new Client[MAX_CLIENTS];
+    }
+
+    //Mutator, accessor and validation--------------------------------------------
+    public String getName(){
+        return this.name;
+    }
+
+    public boolean setName(String name){
+        if (nameIsValid(name)){
+            this.name = name;
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean nameIsValid(String name){
+        if (name.length() >= MIN_NAME_LEN && name.length() <= MAX_NAME_LEN){
+            return true;
+        }
+        return false;
+    }
+
+    //---------------------------------------------------------------------------
+    public boolean addClient(Client client){
+        try{
+            if (numClients + 1 <= MAX_CLIENTS){
+                myClients[numClients] = client;
+                numClients++;
+            }
+            return true;
+        }
+
+        catch (Exception e){
+            return false;
+        }
+    }
+
+
+    public boolean removeClient(Client client){
+        if (client != null){
+            for (int i = 0; i < myClients.length; i++) {
+                if (client == myClients[i]){
+                    for (int j = i+1; j < MAX_CLIENTS; j++) {
+                        myClients[j - 1] = myClients[j];
+
+                        if (j == myClients.length - 1){
+                            //Handles the last element in the list
+                            //so a duplicate isn't created.
+                            myClients[j] = null;
+
+                        }
+                    }
+                    break;
+                }
+            }
+            numClients--;
+            return true;
+        }
+        return false;
+    }
+
+
+    public String toStringClientsShort(){
+
+        String clientNames = new String();
+
+        for (int i = 0; i < myClients.length; i++) {
+            if (myClients[i] != null) {
+                clientNames += (myClients[i].getName() + "\n\n");
+            }
+        }
+        return clientNames;
+    }
+
+
+
+    public String toStringClientsLong(){
+
+        String clientInfo = new String();
+
+        for (int i = 0; i < myClients.length; i++) {
+            if (myClients[i] != null) {
+                clientInfo += (myClients[i].toString() + "\n\n");
+            }
+        }
+
+        return clientInfo;
+    }
+
+
+    public double getIncome(){
+        double totalIncome = 0;
+
+        for (int i = 0; i < numClients; i++) {
+            totalIncome += (myClients[i].getIncomeThisYear() *
+                    (myClients[i].getPercentCut()/100));
+        }
+        return totalIncome;
+    }
+
+}
+
+//Test run
+
+
+/*
+Name: Bill
+Income this year: 125000
+Percent-cut: 2.0
+Age: 43
+Gender: M
+
+
+Name: Jennifer
+Income this year: 56800
+Percent-cut: 3.0
+Age: 32
+Gender: F
+
+
+Name: Brad
+Income this year: 34500
+Percent-cut: 4.0
+Age: 23
+Gender: M
+
+
+Name: Jack
+Income this year: 100000
+Percent-cut: 5.0
+Degree: true
+Technical: true
+International: false
+Government: false
+Rank: co-producer
+
+
+Name: Greg
+Income this year: 12300
+Percent-cut: 15.0
+Degree: false
+Technical: false
+International: true
+Government: true
+Rank: co-executive producer
+
+
+Name: Matthew
+Income this year: 98700
+Percent-cut: 15.0
+Degree: true
+Technical: false
+International: true
+Government: false
+Rank: Story editor
+
+
+
+
+------------Agent string methods-----------
+
+
+Name: Jim
+Income this year: 20000
+Percent-cut: 9.0
+Age: 25
+Gender: M
+
+
+
+Name: Frieda
+Income this year: 78098
+Percent-cut: 7.0
+Age: 29
+Gender: F
+
+
+
+Name: Brad
+Income this year: 34500
+Percent-cut: 4.0
+Age: 23
+Gender: M
+
+
+
+Name: Bob
+Income this year: 54670
+Percent-cut: 12.0
+Degree: false
+Technical: false
+International: true
+Government: false
+Rank: Staff writer
+
+
+
+Name: Joe
+Income this year: 156000
+Percent-cut: 15.0
+Degree: false
+Technical: true
+International: true
+Government: true
+Rank: executive producer
+
+
+
+Name: Bill
+Income this year: 125000
+Percent-cut: 2.0
+Age: 43
+Gender: M
+
+
+
+Name: Jennifer
+Income this year: 56800
+Percent-cut: 3.0
+Age: 32
+Gender: F
+
+
+
+Name: Jack
+Income this year: 100000
+Percent-cut: 5.0
+Degree: true
+Technical: true
+International: false
+Government: false
+Rank: co-producer
+
+
+
+Name: Greg
+Income this year: 12300
+Percent-cut: 15.0
+Degree: false
+Technical: false
+International: true
+Government: true
+Rank: co-executive producer
+
+
+
+Name: Matthew
+Income this year: 98700
+Percent-cut: 15.0
+Degree: true
+Technical: false
+International: true
+Government: false
+Rank: Story editor
+
+
+
+
+Jim
+
+Frieda
+
+Brad
+
+Bob
+
+Joe
+
+Bill
+
+Jennifer
+
+Jack
+
+Greg
+
+Matthew
+
+
+$64461.26
+
+
+------------Agent string methods run #2-----------
+
+
+Name: Jim
+Income this year: 20000
+Percent-cut: 9.0
+Age: 25
+Gender: M
+
+
+
+Name: Frieda
+Income this year: 78098
+Percent-cut: 7.0
+Age: 29
+Gender: F
+
+
+
+Name: Brad
+Income this year: 34500
+Percent-cut: 4.0
+Age: 23
+Gender: M
+
+
+
+Name: Joe
+Income this year: 156000
+Percent-cut: 15.0
+Degree: false
+Technical: true
+International: true
+Government: true
+Rank: executive producer
+
+
+
+Name: Bill
+Income this year: 125000
+Percent-cut: 2.0
+Age: 43
+Gender: M
+
+
+
+Name: Jennifer
+Income this year: 56800
+Percent-cut: 3.0
+Age: 32
+Gender: F
+
+
+
+Name: Jack
+Income this year: 100000
+Percent-cut: 5.0
+Degree: true
+Technical: true
+International: false
+Government: false
+Rank: co-producer
+
+
+
+Name: Greg
+Income this year: 12300
+Percent-cut: 15.0
+Degree: false
+Technical: false
+International: true
+Government: true
+Rank: co-executive producer
+
+
+
+Name: Matthew
+Income this year: 98700
+Percent-cut: 15.0
+Degree: true
+Technical: false
+International: true
+Government: false
+Rank: Story editor
+
+
+
+
+Jim
+
+Frieda
+
+Brad
+
+Joe
+
+Bill
+
+Jennifer
+
+Jack
+
+Greg
+
+Matthew
+
+
+$57900.86
+
+Process finished with exit code 0
+
+ */

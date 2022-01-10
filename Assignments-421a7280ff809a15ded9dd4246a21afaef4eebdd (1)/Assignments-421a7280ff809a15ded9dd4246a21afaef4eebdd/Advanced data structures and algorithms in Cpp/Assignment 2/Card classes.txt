@@ -1,0 +1,294 @@
+// Srivatsan Balaji
+// CS 1B
+// Jesse Cecil
+// November 3 2015
+// Version 1.1
+ 
+ 
+import java.lang.Exception;
+ 
+public class Foothill{
+ 
+    public static void main(String[] args){
+        Card Card1, Card2, Card3, Card4, Card5, Card6, Card7, Card8;
+        Card1 = new Card('4', Card.Suit.diamonds);
+        Card2 = new Card('7', Card.Suit.hearts);
+        Card3 = new Card('9', Card.Suit.spades);
+        Card4 = new Card('3', Card.Suit.clubs);
+        Card5 = new Card('2', Card.Suit.hearts);
+        Card6 = new Card('5', Card.Suit.clubs);
+        Card7 = new Card('6', Card.Suit.spades);
+        Card8 = new Card('8', Card.Suit.diamonds); // Creating a new list of cards
+ 
+        CardQueue newQueue = new CardQueue();
+        newQueue.add(Card1);
+        newQueue.add(Card2);
+        newQueue.add(Card3);
+        newQueue.add(Card4);
+        newQueue.add(Card5);
+        newQueue.add(Card6);
+        newQueue.add(Card7);
+        newQueue.add(Card8);
+        // Adding newQueue's for the Cards
+ 
+        System.out.println("Cards You Have In The Queue: ");
+        System.out.println(newQueue.toString());
+        System.out.println("");
+ 
+        for (int i = 0; i < 9; i++){
+            try{
+                System.out.println(newQueue.remove().toString() + " is removed.");
+            }
+ 
+            catch (QueueEmptyException exception){
+                System.out.println("");
+                System.out.println("No More Cards To Remove. " + "Your Queue is now Empty !!!");
+            }
+        }
+    }
+}
+ 
+// Class Node ----------------------------------
+class Node{
+    protected Node next;
+ 
+    public Node(){
+        next = null;
+    }
+ 
+    public String toString(){
+        return "   generic node ";
+    }
+}
+// End of class node--------------------
+ 
+ 
+ 
+// Class Queue
+class Queue{
+    // pointer to first node in stack
+    private Node front;
+    private Node back;
+ 
+    // constructor
+    public Queue(){
+        front = null;
+        back = null;
+    }
+ 
+    // add and remove method
+    public void add(Node newNode){
+        if (newNode == null)
+            return; // emergency return
+        if (front == null)
+        {
+            front = newNode;
+            back = newNode;
+            front.next = back;
+            return;
+        }
+        back.next = newNode;
+        back = newNode;
+    }
+ 
+    public Node remove() throws QueueEmptyException{
+        Node temp;
+        temp = front;
+        if (front == null)
+            throw new QueueEmptyException();
+        front = front.next;
+        temp.next = null;
+        return temp;
+    }
+ 
+    // console display
+    public String toString(){
+        Node p;
+        String rtrnString = "";
+        for (p = front; p != null; p = p.next)
+        {
+            rtrnString += p.toString() + ", ";
+        }
+        return rtrnString;
+    }
+}
+// End of class Queue------------------------------
+ 
+ 
+ 
+// Class QueueEmptyException
+class QueueEmptyException extends Exception{
+    public QueueEmptyException(){
+ 
+    }
+}
+// End of Class QueueEmptyException--------------
+ 
+ 
+ 
+// CardNode class
+class CardNode extends Node{
+    private Card card;
+ 
+    public CardNode(Card nodeCard){
+        super();
+        card = new Card(nodeCard);
+    }
+ 
+    // toString
+    public String toString(){
+        return card.toString();
+    }
+ 
+    public Card getCard(){
+        return card;
+    }
+}
+// End of Class CardNode------------------
+ 
+ 
+ 
+ 
+// Class CardQueue
+class CardQueue extends Queue
+{
+    public void add(Card cardAdded){
+        CardNode newNode = new CardNode(cardAdded);
+        super.add(newNode);
+    }
+ 
+    public Card removeCard() throws QueueEmptyException{
+        CardNode removedNode = (CardNode) super.remove();
+        if (removedNode == null)
+            throw new QueueEmptyException();
+        return removedNode.getCard();
+    }
+}
+// End of Class CardQueue------------------------
+ 
+ 
+ 
+// Class Card---------------------------------
+ 
+class Card{
+    // type and constants
+ 
+    public enum Suit{
+        clubs, diamonds, hearts, spades
+    }
+ 
+    // private data
+    private char value;
+    private Suit suit;
+    boolean errorFlag;
+ 
+    // 4 overloaded constructors
+    public Card(char value, Suit suit){
+        set(value, suit);
+    }
+ 
+    public Card(char value){
+        this(value, Suit.spades);
+    }
+ 
+    public Card(){
+        this('A', Suit.spades);
+    }
+ 
+    public Card(Card card){
+        this(card.value, card.suit);
+    }
+ 
+    // mutators
+    public boolean set(char value, Suit suit){
+        char upVal; // for getting the upcasing char characters
+ 
+        // convert to uppercase to simplify
+        upVal = Character.toUpperCase(value);
+ 
+        if (!isValid(upVal, suit)){
+            errorFlag = true;
+            return false;
+        }
+ 
+        // else implied
+        errorFlag = false;
+        this.value = upVal;
+        this.suit = suit;
+        return true;
+    }
+ 
+    // accessors
+    public char getVal(){
+        return value;
+    }
+ 
+    public Suit getSuit(){
+        return suit;
+    }
+ 
+    public boolean getErrorFlag(){
+        return errorFlag;
+    }
+ 
+    public boolean equals(Card card){
+        if (this.value != card.value)
+            return false;
+        if (this.suit != card.suit)
+            return false;
+        if (this.errorFlag != card.errorFlag)
+            return false;
+        return true;
+    }
+ 
+    // turns it into a string
+    public String toString(){
+        String retVal;
+ 
+        if (errorFlag)
+            return "** illegal **";
+ 
+        // else implied
+ 
+        retVal = String.valueOf(value);
+        retVal += " of ";
+        retVal += String.valueOf(suit);
+ 
+        return retVal;
+    }
+ 
+    // helper
+    private boolean isValid(char value, Suit suit){
+        char upVal;
+ 
+        // convert to uppercase to simplify (need #include <cctype>)
+        upVal = Character.toUpperCase(value);
+ 
+        // check for validity
+        if (upVal == 'A' || upVal == 'K' || upVal == 'Q' || upVal == 'J'
+            || upVal == 'T' || (upVal >= '2' && upVal <= '9'))
+            return true;
+        else
+            return false;
+    }
+}
+//End of Class Card-----------------------------
+ 
+ 
+/*Test run 
+ 
+ Cards You Have In The Queue: 
+ 4 of diamonds, 7 of hearts, 9 of spades, 3 of clubs, 2 of hearts, 5 of clubs, 6 
+ of spades, 8 of diamonds, 
+ 
+ 4 of diamonds is removed.
+ 7 of hearts is removed.
+ 9 of spades is removed.
+ 3 of clubs is removed.
+ 2 of hearts is removed.
+ 5 of clubs is removed.
+ 6 of spades is removed.
+ 8 of diamonds is removed.
+ 
+ No More Cards To Remove. Your Queue is now Empty !!!
+ ----------------------------------------------*/

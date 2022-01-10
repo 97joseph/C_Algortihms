@@ -179,7 +179,6 @@ int main(){
 
 
 //TOOK .001425 SECONDS
-/*
 foundPerfect=false;
 	maxSum=0;
 	start=clock();
@@ -219,4 +218,4 @@ foundPerfect=false;
 				break;
 			}	
 		}
-	}*/
+	}

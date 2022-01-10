@@ -1,0 +1,16 @@
+Sony camcorder;23;22.20;R
+Panasonic dvd player;20;50.00;R
+Samsung blueray player;13;100.00;N
+Sony tv;10;300.00;N
+xbox one;219;89.99;U
+Sony ps4;35;200.00;N
+Sony ps4;15;94.99;R
+ASUS laptop;12;1999.99;N
+battery;42;10.50;D
+Apple iPhone;42;10.00;D
+dekstop computer;3;360.50;R
+HP printer;5;149.99;N
+Logitech mouse;14;25.70;U
+JBL speakers;11;300.00;R
+DELL monitor;29;49.99;U
+sd card;26;5.00;D

@@ -1,0 +1,1393 @@
+import java.util.Date;
+
+/**
+ * Created by dillon on 3/5/2017.
+ * This class implements FHsdTree and FHsdTreeNode.
+ * The 2 classes make up a generic general tree
+ */
+
+//------------------------------------------------------
+public class Foothill {
+    // -------  main --------------
+    public static void main(String[] args) throws Exception {
+
+        //Sample runs were run one at a time.
+        System.out.println("Main 1:\n\n");
+        main1();
+        System.out.println("Main 2:\n\n");
+        main2();
+        System.out.println("Main 3:\n\n");
+        main3();
+
+
+
+    }
+
+
+    static void main1() throws Exception{
+        FHsdTree<String> sceneTree = new FHsdTree<String>();
+        FHsdTreeNode<String> tn;
+
+        // create a scene in a room
+        tn = sceneTree.addChild(null, "room");
+
+        // add three objects to the scene tree
+        sceneTree.addChild(tn, "Lily the canine");
+        sceneTree.addChild(tn, "Miguel the human");
+        sceneTree.addChild(tn, "table");
+        // add some parts to Miguel
+        tn = sceneTree.find("Miguel the human");
+
+        // Miguel's left arm
+        tn = sceneTree.addChild(tn, "torso");
+        tn = sceneTree.addChild(tn, "left arm");
+        tn =  sceneTree.addChild(tn, "left hand");
+        sceneTree.addChild(tn, "thumb");
+        sceneTree.addChild(tn, "index finger");
+        sceneTree.addChild(tn, "middle finger");
+        sceneTree.addChild(tn, "ring finger");
+        sceneTree.addChild(tn, "pinky");
+
+        // Miguel's right arm
+        tn = sceneTree.find("Miguel the human");
+        tn = sceneTree.find(tn, "torso", 0);
+        tn = sceneTree.addChild(tn, "right arm");
+        tn =  sceneTree.addChild(tn, "right hand");
+        sceneTree.addChild(tn, "thumb");
+        sceneTree.addChild(tn, "index finger");
+        sceneTree.addChild(tn, "middle finger");
+        sceneTree.addChild(tn, "ring finger");
+        sceneTree.addChild(tn, "pinky");
+
+        // add some parts to Lily
+        tn = sceneTree.find("Lily the canine");
+        tn = sceneTree.addChild(tn, "torso");
+        sceneTree.addChild(tn, "right front paw");
+        sceneTree.addChild(tn, "left front paw");
+        sceneTree.addChild(tn, "right rear paw");
+        sceneTree.addChild(tn, "left rear paw");
+        sceneTree.addChild(tn, "spare mutant paw");
+        sceneTree.addChild(tn, "wagging tail");
+
+        // add some parts to table
+        tn = sceneTree.find("table");
+        sceneTree.addChild(tn, "north east leg");
+        sceneTree.addChild(tn, "north west leg");
+        sceneTree.addChild(tn, "south east leg");
+        sceneTree.addChild(tn, "south west leg");
+
+        sceneTree.display();
+        System.out.println("\nVirtual Size: " + sceneTree.size());
+        System.out.println("\nPhysical Size: " + sceneTree.sizePhysical() + "\n");
+
+
+        // clone
+        FHsdTree<String> ClonedTree = (FHsdTree<String>) sceneTree.clone();
+
+        // remove some nodes
+        sceneTree.remove("spare mutant paw");
+        sceneTree.remove("Miguel the human");
+        sceneTree.remove("an imagined higgs boson");
+
+        System.out.println("\n------------------\n");
+        sceneTree.display();
+        System.out.println("\nVirtual Size: " + sceneTree.size());
+
+
+        System.out.println("\n------------------\n");
+        sceneTree.displayPhysical();
+        System.out.println("\nPhysical Size: " + sceneTree.sizePhysical() + "\n");
+
+
+        sceneTree.collectGarbage();
+
+        System.out.println("\n------------------\n");
+        sceneTree.displayPhysical();
+
+        System.out.println("\nVirtual Size: " + sceneTree.size());
+        System.out.println("\nPhysical Size: " + sceneTree.sizePhysical() + "\n");
+
+
+
+        System.out.println("\n------------------\n");
+        // see if the clone worked
+        System.out.println("Clone display");
+        ClonedTree.display();
+        System.out.println("\nClone's Virtual Size: " + ClonedTree.size() + "\n");
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    static void main2() throws Exception{
+
+        FHsdTree<Integer> numTree = new FHsdTree<Integer>();
+        FHsdTreeNode<Integer> tn;
+        FHsdTreeNode<Integer> tn2;
+
+        tn = numTree.addChild(null, 1);
+        for (int i = 9; i >= 2 ; i--) {
+            tn2 =numTree.addChild(tn, i);
+            for (int j = 5; j >= 2 ; j--) {
+                numTree.addChild(tn2, 10 + (int)(Math.random() * 101) );
+            }
+        }
+
+
+
+        tn2 =numTree.addChild(tn, 10);
+        numTree.addChild(tn2, 201 );
+        numTree.addChild(tn2, 332 );
+        numTree.addChild(tn2, 500 );
+        numTree.addChild(tn2, 228 );
+
+
+        numTree.display();
+        System.out.println("\nVirtual Size: " + numTree.size());
+        System.out.println("\nPhysical Size: " + numTree.sizePhysical() + "\n");
+
+
+        // clone
+        FHsdTree<String> ClonedTree = (FHsdTree<String>) numTree.clone();
+
+        // remove some nodes
+        numTree.remove(8);
+        numTree.remove(3);
+        numTree.remove(210);
+        numTree.remove(228);
+        numTree.remove(2390);
+
+        System.out.println("\n------------------\n");
+        numTree.display();
+        System.out.println("\nVirtual Size: " + numTree.size());
+
+
+        System.out.println("\n------------------\n");
+        numTree.displayPhysical();
+        System.out.println("\nPhysical Size: " + numTree.sizePhysical() + "\n");
+
+
+        numTree.collectGarbage();
+
+        System.out.println("\n------------------\n");
+        numTree.displayPhysical();
+
+        System.out.println("\nVirtual Size: " + numTree.size());
+        System.out.println("\nPhysical Size: " + numTree.sizePhysical() + "\n");
+
+
+
+        System.out.println("\n------------------\n");
+        // see if the clone worked
+        System.out.println("Clone display");
+        ClonedTree.display();
+        System.out.println("\nClone's Virtual Size: " + ClonedTree.size() + "\n");
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    static void main3() throws Exception{
+
+        FHsdTree<Employee> EmpTree = new FHsdTree<Employee>();
+        FHsdTreeNode<Employee> tn;
+        FHsdTreeNode<Employee> tn2;
+
+
+        Employee emp1 = new Employee("Supervisor J", 35);
+        Employee emp2 = new Employee("John", 25);
+        Employee emp3 = new Employee("Bob", 25);
+
+
+
+        tn = EmpTree.addChild(null, new Employee("Boss", 50));
+        EmpTree.addChild(tn, new Employee("Joe", 66));//Common generic names
+
+        tn2 = EmpTree.addChild(tn,emp1);
+        EmpTree.addChild(tn2, emp2);
+        EmpTree.addChild(tn2, new Employee("Jim", 32) );
+        EmpTree.addChild(tn2, new Employee("Jack", 28));
+        EmpTree.addChild(tn2, new Employee("HR person", 90));
+
+        EmpTree.addChild(tn, new Employee("Finance person", 50));
+        tn2 = EmpTree.addChild(tn, new Employee("Somebody", 23));
+        EmpTree.addChild(tn2, emp3);
+
+
+
+
+
+        EmpTree.display();
+        System.out.println("\nVirtual Size: " + EmpTree.size());
+        System.out.println("\nPhysical Size: " + EmpTree.sizePhysical() + "\n");
+
+
+        // clone
+        FHsdTree<String> ClonedTree = (FHsdTree<String>) EmpTree.clone();
+
+        // remove some nodes
+        EmpTree.find(tn,emp3, 0);
+        EmpTree.find(tn,emp1, 0);
+        EmpTree.find(tn,new Employee(), 0);
+        EmpTree.remove(emp1);
+        EmpTree.remove(emp3);
+
+        System.out.println("\n------------------\n");
+        EmpTree.display();
+        System.out.println("\nVirtual Size: " + EmpTree.size());
+
+
+        System.out.println("\n------------------\n");
+        EmpTree.displayPhysical();
+        System.out.println("\nPhysical Size: " + EmpTree.sizePhysical() + "\n");
+
+
+        EmpTree.collectGarbage();
+
+        System.out.println("\n------------------\n");
+        EmpTree.displayPhysical();
+
+        System.out.println("\nVirtual Size: " + EmpTree.size());
+        System.out.println("\nPhysical Size: " + EmpTree.sizePhysical() + "\n");
+
+
+
+        System.out.println("\n------------------\n");
+        // see if the clone worked
+        System.out.println("Clone display");
+        ClonedTree.display();
+        System.out.println("\nClone's Virtual Size: " + ClonedTree.size() + "\n");
+    }
+
+}
+
+
+/*
+This class is used to make up the nodes
+of the tree class and provides the appropriate
+accessors and mutators for the tree class.
+ */
+class FHsdTreeNode<E>
+{
+    // use protected access so the tree, in the same package,
+    // or derived classes can access members
+    protected FHsdTreeNode<E> firstChild, sib, prev;
+    protected E data;
+    protected FHsdTreeNode<E> myRoot;  // needed to test for certain error
+    protected boolean deleted;
+
+
+    public FHsdTreeNode(E d, FHsdTreeNode<E> sb, FHsdTreeNode<E> chld,
+                        FHsdTreeNode<E> prv, boolean isDeleted)
+    {
+        firstChild = chld;
+        sib = sb;
+        prev = prv;
+        data = d;
+        myRoot = null;
+        deleted = isDeleted;
+    }
+
+    public FHsdTreeNode(E d, FHsdTreeNode<E> sb, FHsdTreeNode<E> chld,
+                        FHsdTreeNode<E> prv, FHsdTreeNode<E> root, boolean isDeleted)
+    {
+        this(d, sb, chld, prv, isDeleted);
+        myRoot = root;
+    }
+
+    public FHsdTreeNode(E d, FHsdTreeNode<E> sb, FHsdTreeNode<E> chld,
+                        FHsdTreeNode<E> prv, FHsdTreeNode<E> root)
+    {
+        this(d, sb, chld, prv, root, false);
+
+    }
+
+    public FHsdTreeNode()
+    {
+        this(null, null, null, null,false);
+    }
+
+    public FHsdTreeNode(E x) {
+        this();
+        this.setData(x);
+    }
+
+
+
+
+
+
+
+
+
+    public FHsdTreeNode<E> getFirstChild(){
+        return firstChild;
+    }
+
+    public FHsdTreeNode<E> getPrev(){
+        return prev;
+    }
+
+    public FHsdTreeNode<E> getSib(){
+        return sib;
+    }
+
+
+    public FHsdTreeNode<E> getMyRoot(){
+        return myRoot;
+    }
+
+
+    public boolean isDeleted(){
+        return deleted;
+    }
+
+    public E getData() { return data; }
+
+    public void setDeleted(boolean isDeleted){
+        deleted = isDeleted;
+    }
+
+    public void setData(E data){
+        this.data = data;
+    }
+
+    public void setFirstChild(FHsdTreeNode<E> firstChild){
+        this.firstChild = firstChild;
+    }
+
+    public void setPrev(FHsdTreeNode<E> prev){
+        this.prev = prev;
+    }
+
+    public void setSib(FHsdTreeNode<E> sib){
+        this.sib = sib;
+    }
+
+    public void setMyRoot(FHsdTreeNode<E> myRoot){
+        this.myRoot = myRoot;
+    }
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+This class implements the Cloneable interface
+in order to make clones of subtree/trees.
+This class holds represents a general tree
+that holds objects of generic type, so they can
+be of any type that is a subclass of Object.
+ */
+class FHsdTree<E> implements Cloneable {
+
+
+    private int mSize;
+    FHsdTreeNode<E> mRoot;
+
+    public FHsdTree() {
+        clear();
+    }
+
+    public boolean empty() {
+        return (mSize == 0);
+    }
+
+    public int size() {
+        return count(mRoot);
+    }
+
+
+
+
+
+    private int count(FHsdTreeNode<E> root){
+        FHsdTreeNode<E> child = root.getFirstChild();
+        FHsdTreeNode<E> sib = root.getSib();
+
+
+        int count = 1;
+
+        if ( child != null && !root.isDeleted()  ){
+            count += count(child);
+        }
+
+        if ( sib != null ){
+            count += count(sib);
+        }
+
+        if (root.isDeleted()){
+            //in the case that a deleted node us accounted for
+            count--;
+        }
+
+
+
+        return count;
+    }
+
+
+
+
+
+
+
+
+
+    public void clear() {
+        mSize = 0;
+        mRoot = null;
+    }
+
+
+    public FHsdTreeNode<E> find(E x) {
+        return find(mRoot, x, 0);
+    }
+
+    public int sizePhysical(){
+        return mSize;
+    }
+
+
+    public boolean remove(E x) {
+        return remove(mRoot, x);
+    }
+
+
+    public void display() {
+        display(mRoot, 0);
+    }
+
+
+    public <F extends Traverser<? super E>>
+    void traverse(F func) {
+        traverse(func, mRoot, 0);
+    }
+
+
+
+
+
+
+
+
+
+
+    public FHsdTreeNode<E> addChild(FHsdTreeNode<E> treeNode, E x) {//
+        // empty tree? - create a root node if user passes in null
+        if (mSize == 0) {
+            if (treeNode != null)
+                return null; // error something's fishy.  treeNode can't right
+            mRoot = new FHsdTreeNode<E>(x);
+            mRoot.myRoot = mRoot;
+            mSize = 1;
+            return mRoot;
+        }
+        if (treeNode == null)
+            return null; // error inserting into non_null tree with a null parent
+        if (treeNode.myRoot != mRoot)
+            return null;  // silent error, node does not belong to this tree
+
+        // push this node into the head of the sibling list; adjust prev pointers
+        FHsdTreeNode<E> newNode = new FHsdTreeNode<E>(x,
+                treeNode.firstChild, null, treeNode, mRoot);  // sb, chld, prv, rt
+        treeNode.firstChild = newNode;
+        if (newNode.sib != null)
+            newNode.sib.prev = newNode;
+        ++mSize;
+        return newNode;
+    }
+
+
+    public FHsdTreeNode<E> find(FHsdTreeNode<E> root, E x, int level) {//
+        FHsdTreeNode<E> retval;
+
+        if (mSize == 0 || root == null || root.isDeleted())
+            return null;
+
+
+        if (root.data.equals(x))
+            return  root;
+
+        // otherwise, recurse.  don't process sibs if this was the original call
+        if (level > 0 && (retval = find(root.sib, x, level)) != null)
+            return retval;
+        return find(root.firstChild, x, ++level);
+    }
+
+
+    public boolean remove(FHsdTreeNode<E> root, E x) {//
+        FHsdTreeNode<E> tn = null;
+
+        if (mSize == 0 || root == null)
+            return false;
+
+        if ((tn = find(root, x, 0)) != null) {
+            tn.setDeleted(true);
+            return true;
+        }
+        return false;
+    }
+
+
+    public void collectGarbage(){
+
+        collectGarbage(mRoot,0);
+    }
+
+    private void collectGarbage(FHsdTreeNode<E> treeNode, int level){
+
+        if (treeNode == null)
+            return;
+
+        // recursive step done here
+        collectGarbage( treeNode.firstChild, level + 1 );
+        if (level > 0 )
+            collectGarbage( treeNode.sib, level );
+
+        if (treeNode.isDeleted()){
+            removeNode(treeNode);
+        }
+    }
+
+
+
+
+
+    private void removeNode(FHsdTreeNode<E> nodeToDelete) {
+        if (nodeToDelete == null || mRoot == null)
+            return;
+        if (nodeToDelete.myRoot != mRoot)
+            return;  // silent error, node does not belong to this tree
+
+        // remove all the children of this node
+        while (nodeToDelete.firstChild != null){
+            removeNode(nodeToDelete.firstChild);
+
+        }
+
+        mSize--;
+        if (nodeToDelete.prev == null){
+            mRoot = null;  // last node in tree
+        }
+        else if (nodeToDelete.prev.sib == nodeToDelete){
+            nodeToDelete.prev.sib = nodeToDelete.sib; // adjust left sibling
+        }
+        else{
+            nodeToDelete.prev.firstChild = nodeToDelete.sib;  // adjust parent
+        }
+
+        // adjust the successor sib's prev pointer
+        if (nodeToDelete.sib != null)
+            nodeToDelete.sib.prev = nodeToDelete.prev;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    public Object clone() throws CloneNotSupportedException {
+        FHsdTree<E> newObject = (FHsdTree<E>) super.clone();
+        newObject.clear();  // can't point to other's data
+
+        newObject.mRoot = cloneSubtree(mRoot);
+        newObject.mSize = mSize;
+        newObject.setMyRoots(newObject.mRoot);
+
+        return newObject;
+    }
+
+
+
+
+
+
+
+
+
+    private FHsdTreeNode<E> cloneSubtree(FHsdTreeNode<E> root) {
+        FHsdTreeNode<E> newNode;
+        if (root == null)
+            return null;
+
+        // does not set myRoot which must be done by caller
+        newNode = new FHsdTreeNode<E>(root.data,
+                        cloneSubtree(root.sib), cloneSubtree(root.firstChild),
+                        null,root.isDeleted()
+                );
+
+        // the prev pointer is set by parent recursive call ... this is the code:
+        if (newNode.sib != null)
+            newNode.sib.prev = newNode;
+        if (newNode.firstChild != null)
+            newNode.firstChild.prev = newNode;
+        return newNode;
+    }
+
+
+
+
+
+
+
+
+
+
+    // recursively sets all myRoots to mRoot
+    private void setMyRoots(FHsdTreeNode<E> treeNode) {
+        if (treeNode == null)
+            return;
+
+        treeNode.myRoot = mRoot;
+        setMyRoots(treeNode.sib);
+        setMyRoots(treeNode.firstChild);
+    }
+
+
+
+
+
+
+
+
+    // define this as a static member so recursive display() does not need
+    // a local version
+    final static String blankString = "                                    ";
+
+
+
+
+
+
+
+    // let be public so client can call on subtree
+    public void display(FHsdTreeNode<E> treeNode, int level) {//
+        String indent;
+
+        // stop runaway indentation/recursion
+        if (level > (int) blankString.length() - 1) {
+            System.out.println(blankString + " ... ");
+            return;
+        }
+
+        if (treeNode == null)
+            return;
+
+        indent = blankString.substring(0, level);
+
+        if (!treeNode.isDeleted() ){
+            // pre-order processing done here ("visit")
+            System.out.println(indent + treeNode.data);
+        }
+
+
+
+        if(!treeNode.isDeleted()) {
+            // recursive step done here
+            display(treeNode.firstChild, level + 1);
+        }
+
+        if (level > 0)
+            display(treeNode.sib, level);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    class TreeTraverser<E> implements Traverser<E> {//
+        public void visit(E x)
+        {
+            System.out.println(x);
+        }
+
+    };
+
+    public void displayPhysical() {//
+
+        TreeTraverser<E> treeTraverser = new TreeTraverser<E>();
+        traverse(treeTraverser, mRoot, 0);
+
+    }
+
+
+
+
+
+
+
+
+
+
+    //Modified to be used in displayPhysical
+    // often helper of typical public version, but also callable by on subtree
+    public <F extends Traverser<? super E>>
+    void traverse(F func, FHsdTreeNode<E> treeNode, int level) {//
+        String indent;
+
+
+        // stop runaway indentation/recursion
+        if (level > (int) blankString.length() - 1) {
+            System.out.println(blankString + " ... ");
+            return;
+        }
+
+        if (treeNode == null)
+            return;
+
+        indent = blankString.substring(0, level);
+
+        // pre-order processing done here ("visit")
+        if (!treeNode.isDeleted()){
+            System.out.print(indent);
+            func.visit(treeNode.data);
+        }
+        else {
+            System.out.println(indent + "D");
+        }
+
+
+        // recursive step done here
+        traverse(func, treeNode.firstChild, level + 1);
+        if (level > 0)
+            traverse(func, treeNode.sib, level);
+    }
+
+
+
+
+
+
+}
+
+
+
+interface Traverser<E>
+{
+    public void visit(E x);
+
+}
+
+
+
+/*
+Base class that Employee is derived
+from.
+ */
+class Person<E>{
+    private String name;
+    private int age;
+
+    Person(String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+
+    Person(){
+        this("", 0);
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+
+
+
+
+
+
+/*
+This class is used in the client program
+to test generic type objects and provides
+the appropriate accessors and mutators for
+an employee object derived from a person
+object.
+ */
+class Employee<E> extends Person<E>{
+
+    private String jobTitle;
+    private long salary;
+
+    Employee(String name, int age, String jobTitle, long salary){
+
+        super(name, age);
+        this.jobTitle = jobTitle;
+        this.salary = salary;
+    }
+
+    Employee(String name, int age){
+
+        super(name, age);
+        this.jobTitle = "";
+        this.salary = (long)Math.random();
+    }
+
+    Employee(){
+
+        super();
+        this.jobTitle = "";
+        this.salary = (long)Math.random();
+    }
+
+
+    public long getSalary() {
+        return salary;
+    }
+
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public void setSalary(long salary) {
+        this.salary = salary;
+    }
+}
+
+
+
+
+
+//Main 1
+/*
+room
+ table
+  south west leg
+  south east leg
+  north west leg
+  north east leg
+ Miguel the human
+  torso
+   right arm
+    right hand
+     pinky
+     ring finger
+     middle finger
+     index finger
+     thumb
+   left arm
+    left hand
+     pinky
+     ring finger
+     middle finger
+     index finger
+     thumb
+ Lily the canine
+  torso
+   wagging tail
+   spare mutant paw
+   left rear paw
+   right rear paw
+   left front paw
+   right front paw
+
+Virtual Size: 30
+
+Physical Size: 30
+
+
+------------------
+
+room
+ table
+  south west leg
+  south east leg
+  north west leg
+  north east leg
+ Lily the canine
+  torso
+   wagging tail
+   left rear paw
+   right rear paw
+   left front paw
+   right front paw
+
+Virtual Size: 13
+
+------------------
+
+room
+ table
+  south west leg
+  south east leg
+  north west leg
+  north east leg
+ D
+  torso
+   right arm
+    right hand
+     pinky
+     ring finger
+     middle finger
+     index finger
+     thumb
+   left arm
+    left hand
+     pinky
+     ring finger
+     middle finger
+     index finger
+     thumb
+ Lily the canine
+  torso
+   wagging tail
+   D
+   left rear paw
+   right rear paw
+   left front paw
+   right front paw
+
+Physical Size: 30
+
+
+------------------
+
+room
+ table
+  south west leg
+  south east leg
+  north west leg
+  north east leg
+ Lily the canine
+  torso
+   wagging tail
+   left rear paw
+   right rear paw
+   left front paw
+   right front paw
+
+Virtual Size: 13
+
+Physical Size: 13
+
+
+------------------
+
+Clone display
+room
+ table
+  south west leg
+  south east leg
+  north west leg
+  north east leg
+ Miguel the human
+  torso
+   right arm
+    right hand
+     pinky
+     ring finger
+     middle finger
+     index finger
+     thumb
+   left arm
+    left hand
+     pinky
+     ring finger
+     middle finger
+     index finger
+     thumb
+ Lily the canine
+  torso
+   wagging tail
+   spare mutant paw
+   left rear paw
+   right rear paw
+   left front paw
+   right front paw
+
+Clone's Virtual Size: 30
+
+
+Process finished with exit code 0
+ */
+
+
+//Main 2
+/*
+1
+ 10
+  228
+  500
+  332
+  201
+ 2
+  91
+  77
+  71
+  92
+ 3
+  51
+  70
+  104
+  73
+ 4
+  73
+  21
+  22
+  80
+ 5
+  99
+  63
+  25
+  105
+ 6
+  25
+  94
+  89
+  94
+ 7
+  38
+  68
+  68
+  110
+ 8
+  19
+  20
+  52
+  30
+ 9
+  29
+  46
+  102
+  21
+
+Virtual Size: 46
+
+Physical Size: 46
+
+
+------------------
+
+1
+ 10
+  500
+  332
+  201
+ 2
+  91
+  77
+  71
+  92
+ 4
+  73
+  21
+  22
+  80
+ 5
+  99
+  63
+  25
+  105
+ 6
+  25
+  94
+  89
+  94
+ 7
+  38
+  68
+  68
+  110
+ 9
+  29
+  46
+  102
+  21
+
+Virtual Size: 35
+
+------------------
+
+1
+ 10
+  D
+  500
+  332
+  201
+ 2
+  91
+  77
+  71
+  92
+ D
+  51
+  70
+  104
+  73
+ 4
+  73
+  21
+  22
+  80
+ 5
+  99
+  63
+  25
+  105
+ 6
+  25
+  94
+  89
+  94
+ 7
+  38
+  68
+  68
+  110
+ D
+  19
+  20
+  52
+  30
+ 9
+  29
+  46
+  102
+  21
+
+Physical Size: 46
+
+
+------------------
+
+1
+ 10
+  500
+  332
+  201
+ 2
+  91
+  77
+  71
+  92
+ 4
+  73
+  21
+  22
+  80
+ 5
+  99
+  63
+  25
+  105
+ 6
+  25
+  94
+  89
+  94
+ 7
+  38
+  68
+  68
+  110
+ 9
+  29
+  46
+  102
+  21
+
+Virtual Size: 35
+
+Physical Size: 35
+
+
+------------------
+
+Clone display
+1
+ 10
+  228
+  500
+  332
+  201
+ 2
+  91
+  77
+  71
+  92
+ 3
+  51
+  70
+  104
+  73
+ 4
+  73
+  21
+  22
+  80
+ 5
+  99
+  63
+  25
+  105
+ 6
+  25
+  94
+  89
+  94
+ 7
+  38
+  68
+  68
+  110
+ 8
+  19
+  20
+  52
+  30
+ 9
+  29
+  46
+  102
+  21
+
+Clone's Virtual Size: 46
+
+
+Process finished with exit code 0
+
+ */
+
+//Main 3
+/*
+
+
+Employee@26193229
+ Employee@165e6c89
+  Employee@1127a1d8
+ Employee@40f274b4
+ Employee@6dcbf6bb
+  Employee@78ea5d87
+  Employee@5e2b105d
+  Employee@5d3f79f7
+  Employee@726076f4
+ Employee@1b21c7d6
+
+Virtual Size: 10
+
+Physical Size: 10
+
+
+------------------
+
+Employee@26193229
+ Employee@165e6c89
+ Employee@40f274b4
+ Employee@1b21c7d6
+
+Virtual Size: 4
+
+------------------
+
+Employee@26193229
+ Employee@165e6c89
+  D
+ Employee@40f274b4
+ D
+  Employee@78ea5d87
+  Employee@5e2b105d
+  Employee@5d3f79f7
+  Employee@726076f4
+ Employee@1b21c7d6
+
+Physical Size: 10
+
+
+------------------
+
+Employee@26193229
+ Employee@165e6c89
+ Employee@40f274b4
+ Employee@1b21c7d6
+
+Virtual Size: 4
+
+Physical Size: 4
+
+
+------------------
+
+Clone display
+Employee@26193229
+ Employee@165e6c89
+  Employee@1127a1d8
+ Employee@40f274b4
+ Employee@6dcbf6bb
+  Employee@78ea5d87
+  Employee@5e2b105d
+  Employee@5d3f79f7
+  Employee@726076f4
+ Employee@1b21c7d6
+
+Clone's Virtual Size: 10
+
+
+Process finished with exit code 0
+
+ */

@@ -1,0 +1,470 @@
+/**
+ * Created by Dillon Pinto on 1/8/2017.
+ *
+ * This program makes use of the Card and Deck class as the
+ * building-blocks of a card game program. These 2 classes are
+ * tested within  the Foothill class' main method.
+ */
+public class Foothill
+{
+    public static void main(String[] args)
+    {
+        System.out.println("----------------- Card class test ----------------------------\n");
+
+        Card card1 = new Card('9', Card.Suit.hearts);
+        Card card2 = new Card('j', Card.Suit.clubs);
+        Card card3 = new Card('3', Card.Suit.clubs);
+
+        //Print all 3
+        System.out.println(card1.toString());
+        System.out.println(card2.toString());
+        System.out.println(card3.toString());
+        System.out.println("\n\n");
+
+
+        //change cards
+        card1.set('s', Card.Suit.clubs);
+        card2.set('5', Card.Suit.hearts );
+
+
+        //Print all 3 after change
+        System.out.println(card1.toString());
+        System.out.println(card2.toString());
+        System.out.println(card3.toString());
+
+
+
+        System.out.println("\n-----------------------------------------------------------\n");
+
+
+
+
+        System.out.println("----------------- Hand class test ----------------------------\n");
+
+        //Reusing card1 with legal values
+        card1.set('Q', Card.Suit.spades);
+        Card card4 = new Card('K', Card.Suit.diamonds);
+        Card card5 = new Card('T', Card.Suit.spades);
+
+        Hand hand = new Hand();
+
+
+        while (hand.getNumCards() < hand.MAX_CARDS) {
+            hand.takeCard(card1);
+            hand.takeCard(card2);
+            hand.takeCard(card3);
+            hand.takeCard(card4);
+            hand.takeCard(card5);
+        }
+
+
+        System.out.println(hand.toString()+ "\n\n");
+
+
+
+        //Card inspection for 3 cards
+        System.out.println("-----Card inspection-----");
+        System.out.println(hand.inspectCard(1));
+        System.out.println(hand.inspectCard(2));
+        System.out.println(hand.inspectCard(300)+"\n\n");
+
+
+
+
+
+        while (hand.getNumCards() != 0) {
+            System.out.println("Playing " + hand.playCard().toString());
+        }
+
+
+        System.out.println("\n\nAfter playing every card");
+        System.out.println(hand.toString());
+
+
+
+
+        System.out.println("\n-----------------------------------------------------------\n");
+
+
+
+
+
+
+    }
+}
+
+
+
+
+class Card
+{
+
+    public enum Suit {
+        clubs, diamonds, hearts, spades
+    }
+
+    // private data
+    private char value;
+    private Suit suit;
+    private boolean errorFlag;
+
+
+    private boolean isValid(char value, Suit suit){
+        return (value == 'A' || value == 'K' || value == 'Q' || value == 'J'
+                || value == 'T' || (value >= '2' && value <= '9'));
+    }
+
+
+    // 4 overloaded constructors
+
+
+
+
+    public Card( char value, Suit suit)
+    {
+        set(value, suit);
+    }
+
+
+
+
+
+    public Card(char value)
+    {
+        this(value, Suit.spades);
+    }
+
+
+
+
+    public Card()
+    {
+        this('A', Suit.spades);
+    }
+
+
+
+
+
+    // copy constructor
+    public Card(Card card)
+    {
+        this.suit = card.suit;
+        this.value = card.value;
+    }
+
+
+
+
+
+
+
+    // Refined
+    public boolean set(char value, Suit suit)
+    {
+        char upVal; // for upcasing char
+        this.suit = suit;
+        boolean valid = isValid(value, suit);
+
+        upVal = Character.toUpperCase(value);
+        // check for validity
+        if (valid){
+            this.value = upVal;
+            errorFlag = false;
+        }
+
+        else
+        {
+            errorFlag = true;
+            this.value = 'A';
+        }
+
+        //returns whether or not the method completed successfully.
+        return !errorFlag;
+    }
+
+
+
+
+
+
+    // accessors
+    public char getVal()
+    {
+        return value;
+    }
+
+
+
+
+    public Suit getSuit()
+    {
+        return suit;
+    }
+
+
+
+
+
+
+
+    // stringizer
+    public String toString()
+    {
+        if (!errorFlag) {
+            return String.valueOf(this.value) + " of " + this.suit;
+        }
+        else{
+            return "[ invalid ]";
+        }
+    }
+
+
+
+
+    public boolean getErrorFlag(){
+        return errorFlag;
+    }
+
+
+
+
+
+    public boolean equals(Card card){
+        return (this.errorFlag == card.errorFlag &&
+                this.suit == card.suit &&
+                this.value == card.value);
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+class Hand {
+
+
+
+
+
+    public static int MAX_CARDS = 50;
+
+    private Card[] myCards;
+    private int numCards;
+
+
+
+
+
+
+
+    public Hand(){
+        this.myCards = new Card[MAX_CARDS];
+    }
+
+
+
+
+
+
+
+
+
+    public void resetHand(){
+        // check if correct
+        this.numCards = 0;
+
+        for (int i=0; i < MAX_CARDS; i++){
+            this.myCards[i] = null;
+        }
+    }
+
+
+
+
+
+
+
+
+
+    public boolean takeCard(Card card){
+        try {
+            Card cardToAdd = new Card(card.getVal(), card.getSuit());
+            this.myCards[this.numCards] = cardToAdd;
+            this.numCards++;
+
+        }
+        catch(Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+
+
+    public int getNumCards(){
+        return this.numCards;
+    }
+
+
+
+
+
+
+
+    public Card playCard(){
+        int topPosition = getNumCards() - 1;
+        Card topCard =this.myCards[topPosition];
+        myCards[topPosition] = null;
+        numCards--;
+        return topCard;
+    }
+
+
+
+
+
+
+
+
+    public String toString(){
+        String handString = "Hand = ( ";
+        for (int i = 0; i < this.getNumCards(); i++){
+
+            handString += this.myCards[i].toString() ;
+            if (i != (this.getNumCards() - 1)){
+                handString += ", ";
+            }
+            if (i % 5 == 4){
+                handString += "\n";
+            }
+        }
+        return handString += " )";
+    }
+
+
+
+
+
+
+
+    public Card inspectCard(int k){
+
+        try {
+            return this.myCards[k-1];
+        }
+
+
+        catch (ArrayIndexOutOfBoundsException e) {
+            return new Card('F');
+        }
+
+
+    }
+
+}
+
+/**----------------- Card class test ----------------------------
+
+ 9 of hearts
+ [ invalid ]
+ 3 of clubs
+
+
+
+ [ invalid ]
+ 5 of hearts
+ 3 of clubs
+
+ -----------------------------------------------------------
+
+ ----------------- Hand class test ----------------------------
+
+ Hand = ( Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades,
+ Q of spades, 5 of hearts, 3 of clubs, K of diamonds, T of spades
+ )
+
+
+ -----Card inspection-----
+ Q of spades
+ 5 of hearts
+ [ invalid ]
+
+
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+ Playing T of spades
+ Playing K of diamonds
+ Playing 3 of clubs
+ Playing 5 of hearts
+ Playing Q of spades
+
+
+ After playing every card
+ Hand = (  )
+
+ */
+

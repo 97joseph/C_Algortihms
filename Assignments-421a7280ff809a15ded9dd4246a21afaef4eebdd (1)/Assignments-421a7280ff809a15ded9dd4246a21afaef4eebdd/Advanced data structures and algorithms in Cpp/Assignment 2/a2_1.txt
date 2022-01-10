@@ -1,0 +1,15 @@
+1)Debug the second if statement to correct the algorithm.
+ if ( sum(L)+x <= t ), then add the sublist L+x to Col
+ if ( sum(L)+x != t ), break from both loops
+a)if ( sum(L)+x = t )
+b)if ( sum(L)+x ==t )
+c)if ( sum(L)+x < t )
+d)if ( sum(L)+x > t )
+
+
+2)How would you position the iterator to arrange MatNode objects in ascending order
+  of column values?
+a)((*iter).getCol() < c)
+b)((*iter).getCol() <= c)
+c)((*iter).getCol() > c) <-Correct answer
+d)((*iter).getCol() >= c)

@@ -1,0 +1,6 @@
+This &%file    that          has!!,...   
+
+'
+
+This file must have several spaces at the end of the file.
+  19 words.   

@@ -1,0 +1,546 @@
+/**
+ * Created by dillon on 2/26/2017.
+ * This program creates a datamatrix object
+ * to operate as a barcode reader/writer using the
+ * BarcodeIO interface and the BarcodeImage class.
+ */
+public class Foothill {
+
+    public static void main(String[] args){
+
+        String[] sImageIn =
+                {
+                        "                                      ",
+                        "                                      ",
+                        "* * * * * * * * * * * * * *           ",
+                        "*                          *          ",
+                        "***** **** **** ***** ****            ",
+                        "****************************          ",
+                        "*   *  * *  *   *  *  *  *            ",
+                        "**       *   **  **        *          ",
+                        "* **   *   * ** * * * *               ",
+                        "**     *   ***    **    ** *          ",
+                        "****  ****   **   ***  * **           ",
+                        "****************************          "
+                };
+
+        String[] sImageIn_2 =
+                {
+                        "                                          ",
+                        "                                          ",
+                        "* * * * * * * * * * * * * * * * * * *     ",
+                        "*                                    *    ",
+                        "**** *** **   ***** ****   *********      ",
+                        "* ************ ************ **********    ",
+                        "** *      *    *  * * *         * *       ",
+                        "***   *  *           * **    *      **    ",
+                        "* ** * *  *   * * * **  *   ***   ***     ",
+                        "* *           **    *****  *   **   **    ",
+                        "****  *  * *  * **  ** *   ** *  * *      ",
+                        "**************************************    "
+                };
+
+        BarcodeImage bc = new BarcodeImage(sImageIn);
+        DataMatrix dm = new DataMatrix(bc);
+
+        // First secret message
+        dm.translateImageToText();
+        dm.displayTextToConsole();
+        dm.displayImageToConsole();
+
+        // second secret message
+        bc = new BarcodeImage(sImageIn_2);
+        dm.scan(bc);
+        dm.translateImageToText();
+        dm.displayTextToConsole();
+        dm.displayImageToConsole();
+
+        // create your own message
+        dm.readText("CS 1B will lead me to the CASH!");
+        dm.generateImageFromText();
+        dm.displayTextToConsole();
+        dm.displayImageToConsole();
+
+    }
+
+}
+
+
+
+//Interface to be implemented by the datamatrix class
+interface BarcodeIO {
+    public boolean scan(BarcodeImage bc);
+    public boolean readText(String text);
+    public boolean generateImageFromText();
+    public boolean translateImageToText();
+    public void displayTextToConsole();
+    public void displayImageToConsole();
+}
+
+
+
+
+
+
+
+/*
+The BarcodeImage class implements the Cloneable interface
+to create deep copies of the BarcodeImage objects.
+This class holds "images" of barcodes to be read and written
+by the datamatrix class.
+ */
+
+class BarcodeImage implements Cloneable{
+
+    public static final int MAX_HEIGHT = 30;
+    public static final int MAX_WIDTH = 65;
+    private boolean[][] image_data;
+
+    BarcodeImage(){
+        //default values are set to false when initialized
+        image_data = new boolean[MAX_HEIGHT][MAX_WIDTH];
+    }
+
+    BarcodeImage(String[] str_data){
+
+        image_data = new boolean[MAX_HEIGHT][MAX_WIDTH];
+
+        for (int i = 0; i < MAX_HEIGHT; i++) {
+            for (int j = 0; j < MAX_WIDTH; j++) {
+                try{
+                    if (str_data[i].charAt(j) == '*'){
+                        image_data[i][j] = true;
+                    }
+                    else {
+                        image_data[i][j] = false;
+                    }
+                }
+                catch (Exception error){
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public boolean getPixel(int row, int col){
+
+        try{
+            return image_data[row][col];
+        }
+        catch (ArrayIndexOutOfBoundsException error){
+            return false;
+        }
+    }
+
+    public boolean setPixel(int row, int col, boolean value){
+
+        try {
+            image_data[row][col] = value;
+            return true;
+        }
+        catch (ArrayIndexOutOfBoundsException error){
+            return false;
+        }
+    }
+
+
+    public Object clone()throws CloneNotSupportedException{
+
+        BarcodeImage newBarcodeImage = (BarcodeImage)super.clone();
+
+        for (int i = 0; i < MAX_HEIGHT; i++) {
+            for (int j = 0; j < MAX_WIDTH; j++) {
+                newBarcodeImage.setPixel(i,j,this.image_data[i][j]);
+            }
+        }
+        return newBarcodeImage;
+
+    }
+
+
+
+
+
+    public int findStartingPoint(){
+
+        //Finds index position of starting point
+        int startingPoint = 0;
+        while (!this.getPixel(startingPoint, 0)) {
+            startingPoint++;
+        }
+
+        return startingPoint--;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+This class implements the BarcodeIO interface.
+It acts as the reader and writer of BarcodeImage
+objects and performs actions using BarcodeImage objects.
+This class can display barcodes of the datamatrix format
+and convert BarcodeImages to their text forms.
+ */
+
+class DataMatrix implements BarcodeIO{
+
+    public static final char BLACK_CHAR = '*';
+    public static final char WHITE_CHAR = ' ';
+    private BarcodeImage image;
+    private String text;
+    private int actualWidth;
+    private int actualHeight;
+
+
+
+
+    DataMatrix(){
+        image = new BarcodeImage();
+        text = new String();
+
+    }
+
+
+
+
+
+    DataMatrix(BarcodeImage image){
+        if (!scan(image)){
+            this.image = new BarcodeImage();
+        }
+        text = new String();
+    }
+
+
+
+
+
+
+    DataMatrix(String text){
+        image = new BarcodeImage();
+        if (!readText(text)) {
+            this.text = new String();
+        }
+    }
+
+
+
+
+
+
+    public boolean scan(BarcodeImage bc){
+        try {
+            image = (BarcodeImage)bc.clone();
+
+            actualHeight = computeSignalHeight();
+            actualWidth = computeSignalWidth();
+
+            return true;
+        }
+        catch (Exception error) {
+            return false;
+        }
+    }
+
+
+
+
+
+
+
+    public boolean readText(String text){
+        if (text != null) {
+            this.text = text;
+            return true;
+        }
+
+        return false;
+    }
+
+
+
+
+
+
+    public int getActualWidth(){
+        return actualWidth;
+    }
+
+
+
+
+
+    public int getActualHeight(){
+        return actualHeight;
+    }
+
+
+
+
+    private String[] writeCharsToBinary(){
+
+        if (text.length() > BarcodeImage.MAX_WIDTH){
+            return null;
+        }
+
+
+        String[] binaryArray = new String[text.length()];
+        String currentBinaryString = "";
+
+
+        //O(N^2)
+        for (int i = 0; i < text.length(); i++) {
+            currentBinaryString = Integer.toBinaryString(text.charAt(i));
+
+            while (currentBinaryString.length() < 8){
+                currentBinaryString = "0"+ currentBinaryString;
+            }
+
+            binaryArray[i] = currentBinaryString;
+        }
+
+        return binaryArray;
+
+    }
+
+
+    private boolean writeBinaryToImage(){
+
+        String[] binaryArray = writeCharsToBinary();
+        if (binaryArray == null){
+            return false;
+        }
+
+        String[] newImage = new String[BarcodeImage.MAX_HEIGHT];
+
+        image = new BarcodeImage();
+
+        actualWidth = text.length() + 2;
+        actualHeight = 10;
+
+        //Sets borders
+        for (int i = 0; i < actualWidth; i++) {//columns
+
+            for (int j = 0; j < actualHeight; j++) {//rows
+
+                //left spine
+                if (i == 0) {
+                    image.setPixel(j, 0, true);
+                }
+
+                //bottom border
+                else if (j == actualHeight - 1) {
+                    image.setPixel(actualHeight - 1, i, true);
+                }
+
+                //top border
+                else if (j == 0 && (i % 2 == 0) && (i != actualWidth - 1)) {
+                    image.setPixel(j, i, true);
+                }
+
+                //right border
+                else if ((i == actualWidth - 1) && j % 2 == 1) {
+                    image.setPixel(j, i, true);
+                }
+
+
+            }
+        }
+
+        for (int i = 1; i < actualWidth - 1; i++) {//columns
+            for (int j = 1; j < actualHeight - 1; j++) {//rows
+                image.setPixel(j, i, binaryArray[i - 1].charAt(j - 1) == '1');
+            }
+
+        }
+
+
+
+        return true;
+
+
+    }
+
+
+
+    public boolean generateImageFromText(){
+
+        if (!writeBinaryToImage()){
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+    public boolean translateImageToText(){
+
+        String imageToText = new String();
+        int charSum;
+        for (int i = 1; i < BarcodeImage.MAX_WIDTH ; i++) {
+            charSum = 0;
+            for (int j = 3; j < 11; j++) {
+                if (image.getPixel(j,i)){
+                    charSum +=(int) Math.pow(2,(10-j));
+                }
+            }
+            imageToText += (char)charSum;
+        }
+
+        System.out.println(imageToText);
+        return true;
+    }
+
+
+
+
+
+
+
+
+    public void displayTextToConsole(){
+        System.out.println(text);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    private int computeSignalWidth(){
+
+        int width = 0;
+
+        while (image.getPixel(image.findStartingPoint() + actualHeight - 1, width)) {
+            width++;
+        }
+
+        return width;
+    }
+
+
+
+
+
+
+
+
+    private int computeSignalHeight() {
+        int height = 0;
+
+
+        while (image.getPixel( image.findStartingPoint()+ height, 0)) {
+            height++;
+        }
+
+        return height--;
+    }
+
+    
+    
+    
+    
+    
+    
+
+    public void displayImageToConsole(){
+        for (int j = 0; j <= actualWidth+1; j++) {
+            System.out.print('-');
+        }
+        System.out.print('\n');
+        for (int i = image.findStartingPoint(); i < actualHeight; i++) {
+            for (int j = 0; j < actualWidth; j++) {
+                if (j == 0 ){
+                    System.out.print('|');
+                }
+
+
+                if (image.getPixel(i,j)){
+                    System.out.print('*');
+                }
+
+                else{
+                    System.out.print(' ');
+                }
+
+
+                if (j == actualWidth-1){
+                    System.out.print('|');
+                    break;
+                }
+            }
+            System.out.println();
+        }
+
+        System.out.println();
+    }
+}
+
+
+/*
+Sample run
+
+keep away from those tabs!ª                                     
+
+------------------------------
+|* * * * * * * * * * * * * * |
+|*                          *|
+|***** **** **** ***** ****  |
+|****************************|
+|*   *  * *  *   *  *  *  *  |
+|**       *   **  **        *|
+|* **   *   * ** * * * *     |
+|**     *   ***    **    ** *|
+
+You did it!  Great work.  Celebrate.ª                           
+
+----------------------------------------
+|* * * * * * * * * * * * * * * * * * * |
+|*                                    *|
+|**** *** **   ***** ****   *********  |
+|* ************ ************ **********|
+|** *      *    *  * * *         * *   |
+|***   *  *           * **    *      **|
+|* ** * *  *   * * * **  *   ***   *** |
+|* *           **    *****  *   **   **|
+
+CS 1B will lead me to the CASH!
+-----------------------------------
+|* * * * * * * * * * * * * * * *  |
+|*                               *|
+|***  * **** **** ** ** *** ****  |
+|*  ** *********************    **|
+|* * *  *            *  *     *   |
+|*       *** *    *   *  *     * *|
+|*      * ** ** * ** ** * *       |
+|***  * *             *     * *  *|
+|*** *  **    **  **  *   * *** * |
+|*********************************|
+
+
+Process finished with exit code 0
+
+ */
